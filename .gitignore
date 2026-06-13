@@ -1,5 +1,6 @@
 .DS_Store
 .web-extension-id
+.amo-upload-uuid
 dist/
 node_modules/
 npm-debug.log*

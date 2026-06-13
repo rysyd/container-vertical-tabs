@@ -10,23 +10,23 @@
   <body>
     <header class="toolbar">
       <div class="toolbar-row">
-        <div>
-          <h1>Container Tabs</h1>
-          <p id="tab-summary" class="summary">Loading...</p>
-        </div>
+        <h1 class="visually-hidden">Container Tabs</h1>
+        <p id="tab-summary" class="summary">Loading...</p>
         <div class="actions" aria-label="Tab actions">
           <button id="new-tab" class="icon-button" type="button" title="New tab">+</button>
           <button id="refresh-tabs" class="icon-button" type="button" title="Refresh">R</button>
         </div>
       </div>
-      <label class="container-picker">
-        <span>New tab in</span>
-        <select id="new-tab-container"></select>
-      </label>
-      <label class="filter">
-        <span class="visually-hidden">Filter tabs</span>
-        <input id="filter-tabs" type="search" placeholder="Filter tabs">
-      </label>
+      <div class="toolbar-controls">
+        <label class="container-picker">
+          <span class="visually-hidden">New tab in</span>
+          <select id="new-tab-container"></select>
+        </label>
+        <label class="filter">
+          <span class="visually-hidden">Filter tabs</span>
+          <input id="filter-tabs" type="search" placeholder="Filter tabs">
+        </label>
+      </div>
       <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
     </header>
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Container Vertical Tabs",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A Firefox sidebar that shows vertical tabs grouped by Container with collapsible sections.",
   "permissions": [
     "tabs",

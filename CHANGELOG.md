@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented here.
 
+## 0.2.2 - 2026-06-13
+
+- Compressed the sidebar toolbar layout without removing tab creation, refresh, Container selection, filtering, or status messaging.
+
 ## 0.2.1 - 2026-06-13
 
 - Added merged split view display for tabs that share a Firefox `splitViewId` inside the same Container group.
