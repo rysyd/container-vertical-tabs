@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## 0.2.2 - 2026-06-13
+## 0.2.3 - 2026-06-13
 
 - Compressed the sidebar toolbar layout without removing tab creation, refresh, Container selection, filtering, or status messaging.
 
