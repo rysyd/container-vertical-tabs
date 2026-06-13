@@ -719,8 +719,7 @@ async function createTab(groupId) {
     const verifiedTab = await browser.tabs.get(createdTab.id);
     validateCreatedTabStore(verifiedTab, requestedStoreId);
 
-    const label = getStoreLabel(requestedStoreId);
-    setStatus(`Created and verified: ${label}.`, "ok");
+    setStatus("", "neutral");
     await refreshTabs();
     render();
   } catch (error) {
@@ -776,15 +775,6 @@ async function cleanupUnverifiedTab(tabId) {
   } catch (error) {
     console.error("Unable to close unverified tab", error);
   }
-}
-
-function getStoreLabel(cookieStoreId) {
-  if (cookieStoreId === DEFAULT_STORE_ID) {
-    return "No Container";
-  }
-
-  const identity = state.identities.get(cookieStoreId);
-  return identity ? identity.name : cookieStoreId;
 }
 
 function setStatus(message, tone) {

@@ -79,6 +79,45 @@ WebExtensions cannot hide Firefox's built-in horizontal tab strip. Use `userChro
 
 GitHub and AMO release notes live in [docs/RELEASE.md](docs/RELEASE.md) and [docs/AMO_SUBMISSION.md](docs/AMO_SUBMISSION.md).
 
+### Manual Build
+
+Install dependencies and run checks before building:
+
+```bash
+npm ci
+npm run check
+```
+
+Build an unsigned package for local testing or manual review upload:
+
+```bash
+npm run build
+```
+
+The unsigned package is written to `dist/container_vertical_tabs-<version>.zip`.
+
+Build a signed self-distributed `.xpi` through AMO:
+
+```bash
+export WEB_EXT_API_KEY="user:..."
+export WEB_EXT_API_SECRET="..."
+npm run sign:unlisted
+```
+
+The signed package is written to `dist/container_vertical_tabs-<version>.xpi`. The `<version>` comes from `src/manifest.json`; AMO requires each submitted version to be unique, so bump `src/manifest.json`, `package.json`, and `package-lock.json` before signing a new build if that version was already submitted.
+
+For listed AMO submission:
+
+```bash
+export WEB_EXT_API_KEY="user:..."
+export WEB_EXT_API_SECRET="..."
+npm run sign:listed
+```
+
+`npm run sign:listed` submits listing metadata from `amo-metadata.json`; use `npm run sign:unlisted` when you only need a signed `.xpi` for self-distribution or GitHub Releases.
+
+### Automated Release
+
 Push a `v*` tag to let GitHub Actions build and publish the release assets automatically:
 
 ```bash
@@ -87,18 +126,6 @@ git push origin v0.2.0
 ```
 
 Configure `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` as repository secrets so the release workflow uploads a signed unlisted `.xpi`. The workflow fails without those secrets to avoid publishing unsigned release artifacts.
-
-For listed AMO signing:
-
-```bash
-WEB_EXT_API_KEY="user:..." WEB_EXT_API_SECRET="..." npm run sign:listed
-```
-
-For self-distributed signing:
-
-```bash
-WEB_EXT_API_KEY="user:..." WEB_EXT_API_SECRET="..." npm run sign:unlisted
-```
 
 ## Privacy
 
