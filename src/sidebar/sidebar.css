@@ -369,6 +369,9 @@ h1 {
 
 .split-set {
   position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 3px;
   margin: 3px 0 5px;
   padding: 17px 3px 3px 7px;
   border-left: 3px solid var(--split-line);
@@ -379,10 +382,29 @@ h1 {
 .split-set .tab-row {
   margin: 0;
   background: var(--surface);
+  grid-template-columns: minmax(0, 1fr) 22px;
 }
 
 .split-set .tab-row + .tab-row {
-  margin-top: 2px;
+  margin-top: 0;
+}
+
+.split-set .tab-main {
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 5px;
+  padding-right: 3px;
+  padding-left: 4px;
+}
+
+.split-set .favicon {
+  width: 14px;
+  height: 14px;
+}
+
+.split-set .tab-close {
+  width: 20px;
+  height: 24px;
+  margin-right: 0;
 }
 
 .split-label {
