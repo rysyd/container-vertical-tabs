@@ -86,18 +86,18 @@ git tag v0.2.0
 git push origin v0.2.0
 ```
 
-If `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` are configured as repository secrets, the release workflow uploads a signed unlisted `.xpi`. Otherwise it uploads the unsigned build artifact from `dist/`.
+Configure `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` as repository secrets so the release workflow uploads a signed unlisted `.xpi`. The workflow fails without those secrets to avoid publishing unsigned release artifacts.
 
 For listed AMO signing:
 
 ```bash
-AMO_JWT_ISSUER="user:..." AMO_JWT_SECRET="..." npm run sign:listed
+WEB_EXT_API_KEY="user:..." WEB_EXT_API_SECRET="..." npm run sign:listed
 ```
 
 For self-distributed signing:
 
 ```bash
-AMO_JWT_ISSUER="user:..." AMO_JWT_SECRET="..." npm run sign:unlisted
+WEB_EXT_API_KEY="user:..." WEB_EXT_API_SECRET="..." npm run sign:unlisted
 ```
 
 ## Privacy

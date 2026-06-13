@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## Unreleased
+## 0.2.1 - 2026-06-13
 
 - Added merged split view display for tabs that share a Firefox `splitViewId` inside the same Container group.
 - Kept split view tabs together when dragging them within their Container group.

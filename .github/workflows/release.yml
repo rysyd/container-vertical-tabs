@@ -32,6 +32,20 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Sign package with AMO
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          if [ -z "$AMO_JWT_ISSUER" ] || [ -z "$AMO_JWT_SECRET" ]; then
+            echo "::error::AMO_JWT_ISSUER and AMO_JWT_SECRET repository secrets are required for signed releases."
+            exit 1
+          fi
+          rm -f dist/*
+          npm run sign:unlisted
+
       - name: Generate checksums
         run: shasum -a 256 dist/* > dist/SHA256SUMS.txt
 
