@@ -1,0 +1,36 @@
+{
+  "name": "container-vertical-tabs",
+  "version": "0.2.0",
+  "description": "Firefox sidebar extension for vertical tabs grouped by Container with strict cookieStoreId validation.",
+  "private": true,
+  "license": "MIT",
+  "author": "",
+  "homepage": "https://github.com/your-name/container-vertical-tabs#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-name/container-vertical-tabs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-name/container-vertical-tabs/issues"
+  },
+  "scripts": {
+    "check": "npm run check:manifest && npm run check:js && npm run lint:web-ext",
+    "check:js": "node --check src/background.js && node --check src/sidebar/sidebar.js",
+    "check:manifest": "node -e \"JSON.parse(require('node:fs').readFileSync('src/manifest.json', 'utf8'))\"",
+    "lint:web-ext": "web-ext lint --source-dir=src",
+    "build": "web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest",
+    "run": "web-ext run --source-dir=src",
+    "sign:listed": "web-ext sign --source-dir=src --artifacts-dir=dist --channel=listed --amo-metadata=amo-metadata.json",
+    "sign:unlisted": "web-ext sign --source-dir=src --artifacts-dir=dist --channel=unlisted"
+  },
+  "engines": {
+    "node": ">=24",
+    "npm": ">=11"
+  },
+  "devDependencies": {
+    "web-ext": "10.3.0"
+  },
+  "overrides": {
+    "shell-quote": "1.8.4"
+  }
+}

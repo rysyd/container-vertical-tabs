@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Container Vertical Tabs icon">
+  <rect width="96" height="96" rx="20" fill="#20242a"/>
+  <rect x="18" y="18" width="60" height="12" rx="4" fill="#37adff"/>
+  <rect x="18" y="38" width="46" height="12" rx="4" fill="#51cd00"/>
+  <rect x="18" y="58" width="54" height="12" rx="4" fill="#ff9f00"/>
+  <circle cx="77" cy="24" r="5" fill="#f8f8fb"/>
+  <circle cx="77" cy="44" r="5" fill="#f8f8fb"/>
+  <circle cx="77" cy="64" r="5" fill="#f8f8fb"/>
+</svg>

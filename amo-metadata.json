@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "en-US": "Vertical Firefox tabs grouped by Container with collapsible sections."
+  },
+  "categories": {
+    "firefox": [
+      "tabs"
+    ]
+  },
+  "version": {
+    "license": "MIT"
+  },
+  "homepage": {
+    "en-US": "https://github.com/your-name/container-vertical-tabs"
+  },
+  "privacy_policy": {
+    "en-US": "This extension does not collect, transmit, sell, or share personal data. It stores only local UI preferences, such as collapsed Container groups, in browser.storage.local."
+  }
+}

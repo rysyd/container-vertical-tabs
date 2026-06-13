@@ -1,0 +1,6 @@
+.DS_Store
+.web-extension-id
+dist/
+node_modules/
+npm-debug.log*
+web-ext-artifacts/

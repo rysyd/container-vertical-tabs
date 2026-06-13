@@ -1,0 +1,45 @@
+{
+  "manifest_version": 2,
+  "name": "Container Vertical Tabs",
+  "version": "0.2.0",
+  "description": "A Firefox sidebar that shows vertical tabs grouped by Container with collapsible sections.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "contextualIdentities",
+    "cookies"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_title": "Open Container Tabs",
+    "default_icon": "icons/icon.svg"
+  },
+  "sidebar_action": {
+    "default_title": "Container Tabs",
+    "default_panel": "sidebar/sidebar.html",
+    "default_icon": "icons/icon.svg",
+    "open_at_install": true
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "container-vertical-tabs@codex.local",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Container Tabs</title>
+    <link rel="stylesheet" href="sidebar.css">
+    <script defer src="sidebar.js"></script>
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="toolbar-row">
+        <div>
+          <h1>Container Tabs</h1>
+          <p id="tab-summary" class="summary">Loading...</p>
+        </div>
+        <div class="actions" aria-label="Tab actions">
+          <button id="new-tab" class="icon-button" type="button" title="New tab">+</button>
+          <button id="refresh-tabs" class="icon-button" type="button" title="Refresh">R</button>
+        </div>
+      </div>
+      <label class="container-picker">
+        <span>New tab in</span>
+        <select id="new-tab-container"></select>
+      </label>
+      <label class="filter">
+        <span class="visually-hidden">Filter tabs</span>
+        <input id="filter-tabs" type="search" placeholder="Filter tabs">
+      </label>
+      <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+    </header>
+
+    <main id="groups" class="groups" aria-live="polite"></main>
+
+    <template id="group-template">
+      <section class="group">
+        <button class="group-header" type="button" data-action="toggle-group">
+          <span class="chevron" aria-hidden="true"></span>
+          <span class="container-dot" aria-hidden="true"></span>
+          <span class="group-name"></span>
+          <span class="group-count"></span>
+        </button>
+        <button class="group-new-tab" type="button" data-action="new-tab-in-group" title="New tab in this container">+</button>
+        <div class="tab-list" role="list"></div>
+      </section>
+    </template>
+
+    <template id="tab-template">
+      <div class="tab-row" role="listitem">
+        <div class="tab-main" role="button" tabindex="0" data-action="activate-tab">
+          <img class="favicon" alt="">
+          <span class="tab-title"></span>
+          <span class="tab-flags" aria-hidden="true"></span>
+        </div>
+        <button class="tab-close" type="button" data-action="close-tab" title="Close tab">x</button>
+      </div>
+    </template>
+  </body>
+</html>

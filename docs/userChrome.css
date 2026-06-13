@@ -1,0 +1,12 @@
+/* Optional Firefox chrome customization.
+   WebExtensions cannot hide Firefox's built-in top tab bar. */
+
+#TabsToolbar {
+  visibility: collapse !important;
+}
+
+#tabbrowser-tabs,
+#new-tab-button,
+#alltabs-button {
+  display: none !important;
+}
