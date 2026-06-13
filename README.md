@@ -10,6 +10,7 @@ The project is intentionally simple for AMO review: no bundler, no minifier, no 
 - Groups tabs by Firefox Container.
 - Collapses and expands each Container group, with state saved locally.
 - Reorders tabs by dragging them inside the same Container group.
+- Shows Firefox split view tabs as a merged unit inside their Container group.
 - Creates a new tab without a Container or in a selected Container.
 - Verifies every Container tab creation by checking the created tab's `cookieStoreId`.
 - Closes an unverified tab immediately if Container assignment cannot be proven.

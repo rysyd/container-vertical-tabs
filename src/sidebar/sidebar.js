@@ -26,7 +26,8 @@ const state = {
 
 const dragState = {
   groupId: "",
-  tabId: null
+  tabId: null,
+  tabIds: []
 };
 
 const els = {
@@ -304,10 +305,75 @@ function renderGroup(group) {
 
   const list = node.querySelector(".tab-list");
   const fragment = document.createDocumentFragment();
-  for (const tab of group.tabs) {
-    fragment.append(renderTab(tab));
+  for (const item of buildTabItems(group.tabs)) {
+    fragment.append(renderTabItem(item));
   }
   list.append(fragment);
+
+  return node;
+}
+
+function buildTabItems(tabs) {
+  const splitTabs = new Map();
+  for (const tab of tabs) {
+    const splitViewId = getActiveSplitViewId(tab);
+    if (splitViewId === null) continue;
+
+    if (!splitTabs.has(splitViewId)) {
+      splitTabs.set(splitViewId, []);
+    }
+    splitTabs.get(splitViewId).push(tab);
+  }
+
+  const renderedSplitViews = new Set();
+  const items = [];
+
+  for (const tab of tabs) {
+    const splitViewId = getActiveSplitViewId(tab);
+    const tabsInSplitView = splitViewId === null ? null : splitTabs.get(splitViewId);
+
+    if (tabsInSplitView && tabsInSplitView.length > 1) {
+      if (renderedSplitViews.has(splitViewId)) continue;
+
+      renderedSplitViews.add(splitViewId);
+      items.push({
+        splitViewId,
+        tabs: [...tabsInSplitView].sort((a, b) => a.index - b.index),
+        type: "split"
+      });
+      continue;
+    }
+
+    items.push({ tab, type: "tab" });
+  }
+
+  return items;
+}
+
+function renderTabItem(item) {
+  if (item.type === "split") {
+    return renderSplitSet(item);
+  }
+
+  return renderTab(item.tab);
+}
+
+function renderSplitSet(item) {
+  const node = document.createElement("div");
+  const label = document.createElement("span");
+
+  node.className = "split-set";
+  node.dataset.groupId = getTabGroupId(item.tabs[0]);
+  node.dataset.splitViewId = String(item.splitViewId);
+  node.title = "Split view";
+
+  label.className = "split-label";
+  label.textContent = "Split";
+  node.append(label);
+
+  for (const tab of item.tabs) {
+    node.append(renderTab(tab));
+  }
 
   return node;
 }
@@ -317,12 +383,18 @@ function renderTab(tab) {
   const favicon = node.querySelector(".favicon");
   const title = tab.title || tab.url || "Untitled tab";
   const flags = [];
+  const splitViewId = getActiveSplitViewId(tab);
 
   node.draggable = true;
   node.dataset.tabId = String(tab.id);
   node.dataset.active = String(Boolean(tab.active));
   node.dataset.groupId = getTabGroupId(tab);
   node.title = title;
+
+  if (splitViewId !== null) {
+    node.dataset.splitViewId = String(splitViewId);
+    node.title = `${title}\nSplit view`;
+  }
 
   favicon.dataset.empty = "true";
   favicon.addEventListener("load", () => {
@@ -393,11 +465,22 @@ function handleDragStart(event) {
 
   dragState.tabId = Number(tabEl.dataset.tabId);
   dragState.groupId = groupEl.dataset.groupId;
-  tabEl.dataset.dragging = "true";
+  dragState.tabIds = getMovableTabIds(dragState.tabId);
+
+  for (const row of els.groups.querySelectorAll(".tab-row")) {
+    if (dragState.tabIds.includes(Number(row.dataset.tabId))) {
+      row.dataset.dragging = "true";
+    }
+  }
+
+  const splitSetEl = tabEl.closest(".split-set");
+  if (splitSetEl && dragState.tabIds.length > 1) {
+    splitSetEl.dataset.dragging = "true";
+  }
 
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", tabEl.dataset.tabId);
+    event.dataTransfer.setData("text/plain", dragState.tabIds.join(","));
   }
 }
 
@@ -415,7 +498,7 @@ function handleDragOver(event) {
   event.preventDefault();
   if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
 
-  dropTarget.tabEl.dataset.dropPosition = dropTarget.position;
+  dropTarget.indicatorEl.dataset.dropPosition = dropTarget.position;
 }
 
 async function handleDrop(event) {
@@ -435,7 +518,7 @@ async function handleDrop(event) {
 
   event.preventDefault();
   const targetTabId = Number(dropTarget.tabEl.dataset.tabId);
-  await moveTabWithinGroup(dragState.tabId, targetTabId, dropTarget.position);
+  await moveTabsWithinGroup(dragState.tabIds, targetTabId, dropTarget.position);
   clearDragState();
 }
 
@@ -444,9 +527,10 @@ function getDropTarget(event) {
 
   const tabEl = event.target.closest(".tab-row");
   if (tabEl) {
-    if (Number(tabEl.dataset.tabId) === dragState.tabId) return null;
+    if (dragState.tabIds.includes(Number(tabEl.dataset.tabId))) return null;
 
     return {
+      indicatorEl: tabEl.closest(".split-set") || tabEl,
       position: getDropPosition(event, tabEl),
       tabEl
     };
@@ -456,11 +540,12 @@ function getDropTarget(event) {
   if (!listEl) return null;
 
   const rows = [...listEl.querySelectorAll(".tab-row")]
-    .filter((row) => Number(row.dataset.tabId) !== dragState.tabId);
+    .filter((row) => !dragState.tabIds.includes(Number(row.dataset.tabId)));
   const lastRow = rows[rows.length - 1];
   if (!lastRow) return null;
 
   return {
+    indicatorEl: lastRow.closest(".split-set") || lastRow,
     position: "after",
     tabEl: lastRow
   };
@@ -477,45 +562,45 @@ function getDropPosition(event, tabEl) {
 }
 
 function clearDragState() {
-  const draggingEl = els.groups.querySelector('.tab-row[data-dragging="true"]');
-  if (draggingEl) {
+  for (const draggingEl of els.groups.querySelectorAll('[data-dragging="true"]')) {
     delete draggingEl.dataset.dragging;
   }
 
   clearDropIndicators();
   dragState.tabId = null;
+  dragState.tabIds = [];
   dragState.groupId = "";
 }
 
 function clearDropIndicators() {
-  for (const tabEl of els.groups.querySelectorAll(".tab-row[data-drop-position]")) {
-    delete tabEl.dataset.dropPosition;
+  for (const el of els.groups.querySelectorAll("[data-drop-position]")) {
+    delete el.dataset.dropPosition;
   }
 }
 
-async function moveTabWithinGroup(tabId, targetTabId, position) {
-  const draggedTab = state.tabs.find((tab) => tab.id === tabId);
+async function moveTabsWithinGroup(tabIds, targetTabId, position) {
+  const draggedTabs = state.tabs.filter((tab) => tabIds.includes(tab.id));
   const targetTab = state.tabs.find((tab) => tab.id === targetTabId);
-  if (!draggedTab || !targetTab) return;
+  if (!draggedTabs.length || !targetTab) return;
 
-  if (getTabGroupId(draggedTab) !== getTabGroupId(targetTab)) {
+  if (draggedTabs.some((tab) => getTabGroupId(tab) !== getTabGroupId(targetTab))) {
     setStatus("Tabs can only be reordered inside the same Container group.", "error");
     return;
   }
 
-  if (draggedTab.pinned !== targetTab.pinned) {
+  if (draggedTabs.some((tab) => tab.pinned !== targetTab.pinned)) {
     setStatus("Pinned and unpinned tabs cannot be reordered across Firefox's pinned-tab boundary.", "error");
     return;
   }
 
-  const index = getMoveIndex(tabId, targetTabId, position);
-  if (!Number.isInteger(index) || index === draggedTab.index) return;
+  const movePlan = getMovePlan(tabIds, targetTabId, position);
+  if (!movePlan) return;
 
   try {
-    await browser.tabs.move(tabId, { index });
+    await browser.tabs.move(movePlan.tabIds, { index: movePlan.index });
     await refreshTabs();
     render();
-    setStatus("Tab moved.", "ok");
+    setStatus(movePlan.tabIds.length > 1 ? "Split view moved." : "Tab moved.", "ok");
   } catch (error) {
     await refreshTabs();
     render();
@@ -523,23 +608,91 @@ async function moveTabWithinGroup(tabId, targetTabId, position) {
   }
 }
 
-function getMoveIndex(tabId, targetTabId, position) {
+function getMovePlan(tabIds, targetTabId, position) {
+  const draggedSet = new Set(tabIds);
   const orderedTabIds = [...state.tabs]
     .sort((a, b) => a.index - b.index)
     .map((tab) => tab.id);
-  const sourceIndex = orderedTabIds.indexOf(tabId);
-  if (sourceIndex === -1 || !orderedTabIds.includes(targetTabId)) return null;
+  const draggedTabIds = orderedTabIds.filter((id) => draggedSet.has(id));
+  if (!draggedTabIds.length || !orderedTabIds.includes(targetTabId)) return null;
 
-  orderedTabIds.splice(sourceIndex, 1);
-  const targetIndex = orderedTabIds.indexOf(targetTabId);
-  const insertIndex = position === "after" ? targetIndex + 1 : targetIndex;
-  orderedTabIds.splice(insertIndex, 0, tabId);
+  const targetUnitIds = getTabUnitIds(targetTabId);
+  if (targetUnitIds.some((id) => draggedSet.has(id))) return null;
 
-  return orderedTabIds.indexOf(tabId);
+  const remainingTabIds = orderedTabIds.filter((id) => !draggedSet.has(id));
+  const targetIndexes = targetUnitIds
+    .map((id) => remainingTabIds.indexOf(id))
+    .filter((index) => index !== -1);
+  if (!targetIndexes.length) return null;
+
+  const insertIndex = position === "after"
+    ? Math.max(...targetIndexes) + 1
+    : Math.min(...targetIndexes);
+  const nextTabIds = [...remainingTabIds];
+  nextTabIds.splice(insertIndex, 0, ...draggedTabIds);
+
+  if (arraysEqual(orderedTabIds, nextTabIds)) return null;
+
+  return {
+    index: nextTabIds.indexOf(draggedTabIds[0]),
+    tabIds: draggedTabIds
+  };
+}
+
+function getMovableTabIds(tabId) {
+  const tab = state.tabs.find((item) => item.id === tabId);
+  if (!tab) return [tabId];
+
+  const splitViewId = getActiveSplitViewId(tab);
+  if (splitViewId === null) return [tabId];
+
+  const groupId = getTabGroupId(tab);
+  const tabIds = state.tabs
+    .filter((item) => (
+      item.id &&
+      getTabGroupId(item) === groupId &&
+      getActiveSplitViewId(item) === splitViewId &&
+      item.pinned === tab.pinned
+    ))
+    .sort((a, b) => a.index - b.index)
+    .map((item) => item.id);
+
+  return tabIds.length > 1 ? tabIds : [tabId];
+}
+
+function getTabUnitIds(tabId) {
+  const tab = state.tabs.find((item) => item.id === tabId);
+  if (!tab) return [tabId];
+
+  const splitViewId = getActiveSplitViewId(tab);
+  if (splitViewId === null) return [tabId];
+
+  const groupId = getTabGroupId(tab);
+  const tabIds = state.tabs
+    .filter((item) => (
+      item.id &&
+      getTabGroupId(item) === groupId &&
+      getActiveSplitViewId(item) === splitViewId &&
+      item.pinned === tab.pinned
+    ))
+    .sort((a, b) => a.index - b.index)
+    .map((item) => item.id);
+
+  return tabIds.length > 1 ? tabIds : [tabId];
 }
 
 function getTabGroupId(tab) {
   return tab.cookieStoreId || DEFAULT_STORE_ID;
+}
+
+function getActiveSplitViewId(tab) {
+  if (!Number.isInteger(tab.splitViewId)) return null;
+
+  return tab.splitViewId === -1 ? null : tab.splitViewId;
+}
+
+function arraysEqual(left, right) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 async function createTab(groupId) {
