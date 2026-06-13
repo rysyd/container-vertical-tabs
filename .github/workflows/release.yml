@@ -29,16 +29,8 @@ jobs:
       - name: Check extension
         run: npm run check
 
-      - name: Build unsigned package
-        if: ${{ secrets.AMO_JWT_ISSUER == '' || secrets.AMO_JWT_SECRET == '' }}
+      - name: Build package
         run: npm run build
-
-      - name: Sign unlisted XPI
-        if: ${{ secrets.AMO_JWT_ISSUER != '' && secrets.AMO_JWT_SECRET != '' }}
-        env:
-          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
-          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-        run: npm run sign:unlisted
 
       - name: Generate checksums
         run: shasum -a 256 dist/* > dist/SHA256SUMS.txt
