@@ -39,6 +39,32 @@ npm run build
 
 Upload the generated package from `dist/` to GitHub Releases or AMO.
 
+## GitHub Release Automation
+
+Pushing a version tag that starts with `v` triggers [release.yml](../.github/workflows/release.yml).
+
+Example:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The workflow:
+
+- installs dependencies
+- runs `npm run check`
+- builds an unsigned package with `npm run build`
+- or, if `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` GitHub Actions secrets are set, runs `npm run sign:unlisted` and uploads the signed `.xpi`
+- publishes everything in `dist/` to the GitHub Release for that tag, including `SHA256SUMS.txt`
+
+Required repository secrets for signed self-hosted `.xpi` releases:
+
+- `AMO_JWT_ISSUER`
+- `AMO_JWT_SECRET`
+
+Without those secrets, the workflow still creates a GitHub Release, but it uploads the unsigned build artifact instead of a signed `.xpi`.
+
 ## AMO Listed Signing
 
 Set credentials from the AMO Developer Hub:

@@ -78,6 +78,15 @@ WebExtensions cannot hide Firefox's built-in horizontal tab strip. Use `userChro
 
 GitHub and AMO release notes live in [docs/RELEASE.md](docs/RELEASE.md) and [docs/AMO_SUBMISSION.md](docs/AMO_SUBMISSION.md).
 
+Push a `v*` tag to let GitHub Actions build and publish the release assets automatically:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+If `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` are configured as repository secrets, the release workflow uploads a signed unlisted `.xpi`. Otherwise it uploads the unsigned build artifact from `dist/`.
+
 For listed AMO signing:
 
 ```bash
