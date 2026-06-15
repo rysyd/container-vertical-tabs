@@ -1,8 +1,13 @@
+<img width="1512" height="879" alt="iShot_2026-06-13_15 46 37" src="https://github.com/user-attachments/assets/fe67f532-1502-4ef7-917f-002d783c9179" />
+
+
 # Container Vertical Tabs
 
 Container Vertical Tabs is a Firefox extension that replaces tab scanning with a sidebar-first workflow. It lists tabs vertically, groups them by Firefox Container, and lets each Container group collapse independently.
 
 The project is intentionally simple for AMO review: no bundler, no minifier, no remote code, and no build-time source transformation. The package submitted to Firefox is generated directly from `src/`.
+
+Just a project built with Codex to solve a small problem of mine.
 
 ## Features
 
